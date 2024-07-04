@@ -5,7 +5,6 @@ import os
 
 class BasicConanfile(ConanFile):
     name = "qnn"
-    version = "2.22.0.240425"
     description = "Qualcomm AI Engine Direct"
     license = "QTIL"
 
@@ -13,20 +12,10 @@ class BasicConanfile(ConanFile):
 
     build_policy = "missing"
 
-    no_copy_source = True
-
     target_socs = ["68", "69", "73", "75"]
 
     def source(self):
-        qnn_url = (
-            "https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v"
-            + self.version
-            + ".zip"
-        )
-        qnn_checksum = (
-            "d68ed4d92187101a9759384cbce0a35bd383840b2e3c3c746a4d35f99823a75a"
-        )
-        get(self, qnn_url, sha256=qnn_checksum)
+        get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def layout(self):
         self.folders.build = "build"

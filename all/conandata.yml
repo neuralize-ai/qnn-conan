@@ -1,0 +1,7 @@
+sources:
+  "2.23.0.24.06.24":
+    url: "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.16.2.tar.gz"
+    sha256: "f197686c4a59839f8efe08e814b591c8953ee558b8bbb47e2939053746de9ae3"
+  "2.22.0.240425":
+    url: "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.12.0.tar.gz"
+    sha256: "d68ed4d92187101a9759384cbce0a35bd383840b2e3c3c746a4d35f99823a75a"
