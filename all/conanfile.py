@@ -10,12 +10,13 @@ class BasicConanfile(ConanFile):
 
     settings = "os", "arch"
 
-    build_policy = "missing"
-
     target_socs = ["68", "69", "73", "75"]
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        get(
+            self,
+            **self.conan_data["sources"][self.version],
+        )
 
     def layout(self):
         self.folders.build = "build"
@@ -37,13 +38,12 @@ class BasicConanfile(ConanFile):
             str(self.settings.os)
         )
 
-        include_path = os.path.join(
-            self.source_folder, "qairt", str(self.version), "include"
-        )
+        source_path = os.path.join(self.source_folder, "qairt")
+        source_path = os.path.join(source_path, os.listdir(source_path)[0])
 
-        base_lib_path = os.path.join(
-            self.source_folder, "qairt", str(self.version), "lib"
-        )
+        include_path = os.path.join(source_path, "include")
+
+        base_lib_path = os.path.join(source_path, "lib")
         lib_dir = _arch + "-" + _os
 
         lib_path = os.path.join(base_lib_path, lib_dir)
