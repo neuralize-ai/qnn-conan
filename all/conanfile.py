@@ -40,7 +40,7 @@ class BasicConanfile(ConanFile):
         source_path = os.path.join(self.source_folder, "qairt")
         source_path = os.path.join(source_path, os.listdir(source_path)[0])
 
-        include_path = os.path.join(source_path, "include")
+        include_path = os.path.join(source_path, "include/QNN")
 
         base_lib_path = os.path.join(source_path, "lib")
         lib_dir = _arch + "-" + _os
@@ -100,6 +100,7 @@ class BasicConanfile(ConanFile):
         self.cpp_info.components["qnn"].includedirs = ["include"]
         self.cpp_info.components["qnn"].libs = []
         self.cpp_info.components["qnn"].libdirs = []
+
         if self.settings.os == "Android":
             self.cpp_info.components["tfliteDelegate"].set_property(
                 "cmake_file_name", "tfliteDelegate"
