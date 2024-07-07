@@ -70,6 +70,14 @@ class BasicConanfile(ConanFile):
             os.path.join(self.package_folder, "lib", "htp"),
         )
 
+        if self.settings.os == "Linux":
+            copy(
+                self,
+                "libHtpPrepare.so",
+                lib_path,
+                os.path.join(self.package_folder, "lib", "htp"),
+            )
+
         for soc in self.target_socs:
             soc_dir = os.path.join(
                 self.package_folder, base_lib_path, "hexagon-v" + soc, "unsigned"
@@ -87,10 +95,16 @@ class BasicConanfile(ConanFile):
         self.cpp_info.names["cmake_find_package_multi"] = "qnn"
         self.cpp_info.set_property("cmake_target_name", "qnn::qnn")
 
-        self.cpp_info.components["tfliteDelegate"].libs = ["QnnTFLiteDelegate"]
-        self.cpp_info.components["tfliteDelegate"].libdirs = ["lib/tflite"]
-        self.cpp_info.components["tfliteDelegate"].set_property(
-            "cmake_target_name", "qnn::tfliteDelegate"
+        if self.settings.os == "Android":
+            self.cpp_info.components["tfliteDelegate"].set_property(
+                "cmake_file_name", "tfliteDelegate"
+            )
+            self.cpp_info.components["tfliteDelegate"].set_property(
+                "cmake_target_name", "qnn::tfliteDelegate"
+            )
+            self.cpp_info.components["tfliteDelegate"].libs = ["QnnTFLiteDelegate"]
+            self.cpp_info.components["tfliteDelegate"].libdirs = ["lib/tflite"]
+
         )
 
         htp_libs = ["QnnSystem", "QnnHtp", "QnnHtpPrepare"]
