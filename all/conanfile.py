@@ -110,13 +110,21 @@ class BasicConanfile(ConanFile):
             self.cpp_info.components["tfliteDelegate"].libs = ["QnnTFLiteDelegate"]
             self.cpp_info.components["tfliteDelegate"].libdirs = ["lib/tflite"]
 
+        htp_prepare_lib = (
+            "HtpPrepare" if self.settings.arch == "x86_64" else "QnnHtpPrepare"
         )
 
-        htp_libs = ["QnnSystem", "QnnHtp", "QnnHtpPrepare"]
+        htp_libs = ["QnnSystem", "QnnHtp", htp_prepare_lib]
 
-        for soc in self.target_socs:
-            htp_libs += ["QnnHtpV" + soc + "Stub", "QnnHtpV" + soc + "Skel"]
+        if self.settings.arch == "armv8":
+            for soc in self.target_socs:
+                htp_libs += ["QnnHtpV" + soc + "Skel"]
+                if self.settings.os == "Android":
+                    htp_libs += ["QnnHtpV" + soc + "Stub"]
 
-        self.cpp_info.components["htp"].libs = htp_libs
-        self.cpp_info.components["htp"].libdirs = ["lib/htp"]
-        self.cpp_info.components["htp"].set_property("cmake_target_name", "qnn::htp")
+            self.cpp_info.components["htp"].set_property("cmake_file_name", "htp")
+            self.cpp_info.components["htp"].set_property(
+                "cmake_target_name", "qnn::htp"
+            )
+            self.cpp_info.components["htp"].libs = htp_libs
+            self.cpp_info.components["htp"].libdirs = ["lib/htp"]
