@@ -25,7 +25,6 @@ class BasicConanfile(ConanFile):
         self.folders.package = "package"
 
     def package(self):
-
         linux = "linux"
         _arch = str(self.settings.arch).lower()
         if _arch == "armv8":
@@ -49,12 +48,15 @@ class BasicConanfile(ConanFile):
         lib_path = os.path.join(base_lib_path, lib_dir)
 
         copy(self, "*.h", include_path, os.path.join(self.package_folder, "include"))
-        copy(
-            self,
-            "libQnnTFLiteDelegate.so",
-            lib_path,
-            os.path.join(self.package_folder, "lib", "tflite"),
-        )
+
+        if self.settings.os == "Android":
+            copy(
+                self,
+                "libQnnTFLiteDelegate.so",
+                lib_path,
+                os.path.join(self.package_folder, "lib", "tflite"),
+            )
+
         copy(
             self,
             "libQnnSystem.so",
