@@ -90,11 +90,16 @@ class BasicConanfile(ConanFile):
             )
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "qnn")
         self.cpp_info.names["cmake_find_package"] = "qnn"
         self.cpp_info.names["cmake_find_package_multi"] = "qnn"
-        self.cpp_info.set_property("cmake_target_name", "qnn::qnn")
 
+        self.cpp_info.components["qnn"].set_property("cmake_file_name", "qnn")
+        self.cpp_info.components["qnn"].set_property("cmake_target_name", "qnn::qnn")
+        self.cpp_info.components["qnn"].names["cmake_find_package"] = "qnn"
+        self.cpp_info.components["qnn"].names["cmake_find_package_multi"] = "qnn"
+        self.cpp_info.components["qnn"].includedirs = ["include"]
+        self.cpp_info.components["qnn"].libs = []
+        self.cpp_info.components["qnn"].libdirs = []
         if self.settings.os == "Android":
             self.cpp_info.components["tfliteDelegate"].set_property(
                 "cmake_file_name", "tfliteDelegate"
