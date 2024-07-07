@@ -102,14 +102,12 @@ class BasicConanfile(ConanFile):
         self.cpp_info.components["qnn"].libdirs = []
 
         if self.settings.os == "Android":
-            self.cpp_info.components["tfliteDelegate"].set_property(
-                "cmake_file_name", "tfliteDelegate"
+            self.cpp_info.components["tflite"].set_property("cmake_file_name", "tflite")
+            self.cpp_info.components["tflite"].set_property(
+                "cmake_target_name", "qnn::tflite"
             )
-            self.cpp_info.components["tfliteDelegate"].set_property(
-                "cmake_target_name", "qnn::tfliteDelegate"
-            )
-            self.cpp_info.components["tfliteDelegate"].libs = ["QnnTFLiteDelegate"]
-            self.cpp_info.components["tfliteDelegate"].libdirs = ["lib/tflite"]
+            self.cpp_info.components["tflite"].libs = ["QnnTFLiteDelegate"]
+            self.cpp_info.components["tflite"].libdirs = ["lib/tflite"]
 
         htp_prepare_lib = (
             "HtpPrepare" if self.settings.arch == "x86_64" else "QnnHtpPrepare"
