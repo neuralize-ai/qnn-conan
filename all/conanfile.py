@@ -10,6 +10,8 @@ class BasicConanfile(ConanFile):
 
     settings = "os", "arch"
 
+    package_type = "shared-library"
+
     target_socs = ["68", "69", "73", "75"]
 
     def source(self):
@@ -57,73 +59,60 @@ class BasicConanfile(ConanFile):
                 os.path.join(self.package_folder, "lib", "tflite"),
             )
 
-        copy(
-            self,
-            "libQnnSystem.so",
-            lib_path,
-            os.path.join(self.package_folder, "lib", "htp"),
-        )
-        copy(
-            self,
-            "libQnnHtp*.so",
-            lib_path,
-            os.path.join(self.package_folder, "lib", "htp"),
-        )
-
-        if self.settings.os == "Linux":
-            copy(
-                self,
-                "libHtpPrepare.so",
-                lib_path,
-                os.path.join(self.package_folder, "lib", "htp"),
-            )
-
-        for soc in self.target_socs:
-            soc_dir = os.path.join(
-                self.package_folder, base_lib_path, "hexagon-v" + soc, "unsigned"
-            )
-            copy(
-                self,
-                "libQnnHtpV" + soc + "Skel.so",
-                soc_dir,
-                os.path.join(self.package_folder, "lib", "htp"),
-            )
-
-    def package_info(self):
-        self.cpp_info.names["cmake_find_package"] = "qnn"
-        self.cpp_info.names["cmake_find_package_multi"] = "qnn"
-
-        self.cpp_info.components["qnn"].set_property("cmake_file_name", "qnn")
-        self.cpp_info.components["qnn"].set_property("cmake_target_name", "qnn::qnn")
-        self.cpp_info.components["qnn"].names["cmake_find_package"] = "qnn"
-        self.cpp_info.components["qnn"].names["cmake_find_package_multi"] = "qnn"
-        self.cpp_info.components["qnn"].includedirs = ["include"]
-        self.cpp_info.components["qnn"].libs = []
-        self.cpp_info.components["qnn"].libdirs = []
-
-        if self.settings.os == "Android":
-            self.cpp_info.components["tflite"].set_property("cmake_file_name", "tflite")
-            self.cpp_info.components["tflite"].set_property(
-                "cmake_target_name", "qnn::tflite"
-            )
-            self.cpp_info.components["tflite"].libs = ["QnnTFLiteDelegate"]
-            self.cpp_info.components["tflite"].libdirs = ["lib/tflite"]
-
         htp_prepare_lib = (
             "HtpPrepare" if self.settings.arch == "x86_64" else "QnnHtpPrepare"
         )
 
         htp_libs = ["QnnSystem", "QnnHtp", htp_prepare_lib]
 
+        for htpLib in htp_libs:
+            libName = "lib" + htpLib + ".so"
+            copy(
+                self,
+                libName,
+                lib_path,
+                os.path.join(self.package_folder, "lib", "htp"),
+            )
+
         if self.settings.arch == "armv8":
             for soc in self.target_socs:
-                htp_libs += ["QnnHtpV" + soc + "Skel"]
-                if self.settings.os == "Android":
-                    htp_libs += ["QnnHtpV" + soc + "Stub"]
+                stubLib = "libQnnHtpV" + soc + "Stub.so"
+                skelLib = "libQnnHtpV" + soc + "Skel.so"
 
-            self.cpp_info.components["htp"].set_property("cmake_file_name", "htp")
+                copy(
+                    self,
+                    stubLib,
+                    lib_path,
+                    os.path.join(self.package_folder, "lib", "htp"),
+                )
+
+                soc_dir = os.path.join(
+                    self.package_folder, base_lib_path, "hexagon-v" + soc, "unsigned"
+                )
+                copy(
+                    self,
+                    skelLib,
+                    soc_dir,
+                    os.path.join(self.package_folder, "lib", "htp"),
+                )
+
+    def package_info(self):
+        self.cpp_info.components["headers"].set_property(
+            "cmake_target_name", "qnn::headers"
+        )
+        self.cpp_info.components["headers"].includedirs = ["include"]
+        self.cpp_info.components["headers"].libs = []
+        self.cpp_info.components["headers"].libdirs = []
+
+        if self.settings.os == "Android":
+            self.cpp_info.components["tflite"].set_property(
+                "cmake_target_name", "qnn::tflite"
+            )
+            self.cpp_info.components["tflite"].libs = ["QnnTFLiteDelegate"]
+            self.cpp_info.components["tflite"].libdirs = ["lib/tflite"]
+
+        if self.settings.arch == "armv8":
             self.cpp_info.components["htp"].set_property(
                 "cmake_target_name", "qnn::htp"
             )
-            self.cpp_info.components["htp"].libs = htp_libs
             self.cpp_info.components["htp"].libdirs = ["lib/htp"]
