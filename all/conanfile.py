@@ -10,6 +10,14 @@ class BasicConanfile(ConanFile):
 
     settings = "os", "arch"
 
+    options = {
+        "with_tflite": [True, False],
+    }
+
+    default_options = {
+        "with_tflite": True,
+    }
+
     package_type = "shared-library"
 
     target_socs = ["68", "69", "73", "75"]
@@ -49,15 +57,15 @@ class BasicConanfile(ConanFile):
 
         lib_path = os.path.join(base_lib_path, lib_dir)
 
-        copy(self, "*.h", include_path, os.path.join(self.package_folder, "include"))
+        copy(self, "*.h", include_path,
+             os.path.join(self.package_folder, "include"))
 
-        if self.settings.os == "Android":
-            copy(
-                self,
-                "libQnnTFLiteDelegate.so",
-                lib_path,
-                os.path.join(self.package_folder, "lib", "tflite"),
-            )
+        copy(
+            self,
+            "libQnnTFLiteDelegate.so",
+            lib_path,
+            os.path.join(self.package_folder, "lib", "tflite"),
+        )
 
         htp_prepare_lib = (
             "HtpPrepare" if self.settings.arch == "x86_64" else "QnnHtpPrepare"
@@ -104,7 +112,7 @@ class BasicConanfile(ConanFile):
         self.cpp_info.components["headers"].libs = []
         self.cpp_info.components["headers"].libdirs = []
 
-        if self.settings.os == "Android":
+        if self.options.with_tflite and self.settings.os == "Android":
             self.cpp_info.components["tflite"].set_property(
                 "cmake_target_name", "qnn::tflite"
             )
