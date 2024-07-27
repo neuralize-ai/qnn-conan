@@ -1,5 +1,6 @@
 from conan import ConanFile
 from conan.tools.files import get, copy
+from conan.errors import ConanInvalidConfiguration
 import os
 
 
@@ -23,10 +24,20 @@ class BasicConanfile(ConanFile):
     target_socs = ["68", "69", "73", "75"]
 
     def source(self):
-        get(
-            self,
-            **self.conan_data["sources"][self.version],
-        )
+        if self.version == "custom":
+            sdk_path = os.getenv("QNN_SDK_PATH")
+            if not sdk_path:
+                raise ConanInvalidConfiguration(
+                    "QNN_SDK_PATH environment variable is not set")
+            self.output.info(f"Using QNN SDK from: {sdk_path}")
+            # Copy the SDK files to the source folder
+            copy(self, "*", src=sdk_path,
+                 dst=os.path.join(self.source_folder, "qairt", "custom"))
+        else:
+            get(
+                self,
+                **self.conan_data["sources"][self.version],
+            )
 
     def layout(self):
         self.folders.build = "build"

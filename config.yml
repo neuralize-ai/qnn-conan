@@ -1,4 +1,6 @@
 versions:
+  "custom":
+    folder: all
   "2.23.0.24.06.24":
     folder: all
   "2.22.0.240425":
